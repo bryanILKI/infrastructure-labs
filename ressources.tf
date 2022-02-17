@@ -76,11 +76,20 @@ resource "scaleway_lb" "lb" {
   }
 }
 
+resource "scaleway_lb_frontend" "frontend01" {
+  lb_id        = scaleway_lb.lb.id
+  backend_id   = scaleway_lb_backend.backend01.id
+  name         = "frontend01"
+  inbound_port = "6443"
+}
+
 resource "scaleway_lb_backend" "backend01" {
   lb_id            = scaleway_lb.lb.id
   name             = "lb_backend"
   forward_protocol = "http"
   forward_port     = "6443"
+
+  server_ips = [scaleway_instance_server.master[0].private_ip, scaleway_instance_server.master[1].private_ip, scaleway_instance_server.master[2].private_ip]
 }
 
 output "lb_public_ip" {
